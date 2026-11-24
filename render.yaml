@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: pdf-studio
+    runtime: docker
+    plan: free            # change to "starter" for always-on + more RAM
+    healthCheckPath: /healthz
+    envVars:
+      - key: SITE_NAME
+        value: PDF Studio Pro
+      - key: AUTHOR
+        value: Brajesh Yadav
+      - key: CONTACT_EMAIL
+        sync: false
+      - key: SITE_URL
+        sync: false
+      - key: SOURCE_URL
+        sync: false

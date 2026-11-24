@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}{{ info.title.format(site=cfg.SITE_NAME) }}{% endblock %}
+{% block meta %}{{ info.meta }}{% endblock %}
+{% block keywords %}<meta name="keywords" content="{{ info.keywords }}">{% endblock %}
+{% block head %}
+<script type="application/ld+json">{{ ld_faq|tojson }}</script>
+<script type="application/ld+json">{{ ld_app|tojson }}</script>
+{% endblock %}
+{% block content %}
+<section class="hero small" style="--c:{{ tool.color }}"><div class="wrap">
+  <h1>{{ info.h1 }}</h1><p>{{ tool.desc }}</p>
+</div></section>
+
+{% if cfg.ADSENSE_CLIENT %}<div class="wrap ad"><ins class="adsbygoogle" style="display:block" data-ad-client="{{ cfg.ADSENSE_CLIENT }}" data-ad-slot="auto" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>{% endif %}
+
+<section class="wrap work" id="app"
+  data-key="{{ tool.key }}" data-ordered="{{ 'true' if not tool.per_file else 'false' }}"
+  data-accept="{{ accept }}" data-action="{{ tool.action }}" data-maxmb="{{ max_mb }}" data-maxfiles="{{ max_files }}">
+
+  <div id="stepUpload">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose files">
+      <div class="big">{{ info.icon }}</div>
+      <strong>Drop {{ 'images' if tool.kind == 'image' else 'PDF files' }} here</strong>
+      <span>or click to choose · up to {{ max_files }} files · {{ max_mb }} MB total</span>
+      <input type="file" id="picker" multiple accept="{{ accept }}" hidden>
+    </div>
+    <ul class="files" id="files"></ul>
+  </div>
+
+  <form id="opts" class="opts" autocomplete="off" hidden>
+    <h3>Options</h3>
+    {% for f in fields %}
+    <div class="field" data-key="{{ f.key }}" data-type="{{ f.type }}">
+      {% if f.type == 'bool' %}
+        <label class="chk"><input type="checkbox" name="{{ f.key }}" {{ 'checked' if f.default }}> {{ f.label }}</label>
+      {% elif f.type == 'choice' %}
+        <label for="o_{{ f.key }}">{{ f.label }}</label>
+        <select id="o_{{ f.key }}" name="{{ f.key }}">{% for c in f.choices %}<option {{ 'selected' if c == f.default }}>{{ c }}</option>{% endfor %}</select>
+      {% elif f.type == 'slider' %}
+        <label for="o_{{ f.key }}">{{ f.label }}: <b class="sv" data-fmt="{{ f.fmt }}">{{ f.fmt.format(f.default) }}</b></label>
+        <input type="range" id="o_{{ f.key }}" name="{{ f.key }}" min="{{ f.min }}" max="{{ f.max }}" value="{{ f.default }}">
+      {% elif f.type in ('int', 'float') %}
+        <label for="o_{{ f.key }}">{{ f.label }}</label>
+        <input type="number" id="o_{{ f.key }}" name="{{ f.key }}" min="{{ f.min }}" max="{{ f.max }}" step="{{ f.get('step', 1) }}" value="{{ f.default }}">
+      {% elif f.type == 'color' %}
+        <label for="o_{{ f.key }}">{{ f.label }}</label>
+        <input type="color" id="o_{{ f.key }}" name="{{ f.key }}" value="{{ f.default }}">
+      {% else %}
+        <label for="o_{{ f.key }}">{{ f.label }}</label>
+        <input type="{{ 'password' if f.get('secret') else 'text' }}" id="o_{{ f.key }}" name="{{ f.key }}" value="{{ f.default }}" autocomplete="new-password" maxlength="500">
+      {% endif %}
+      <small class="help"></small>
+    </div>
+    {% endfor %}
+  </form>
+
+  <div class="actions" id="actions" hidden>
+    <button class="btn" id="go" type="button">{{ tool.action }}</button>
+    <button class="btn ghost" id="clear" type="button">Clear</button>
+  </div>
+  <div class="progress" id="prog" hidden><div class="bar"><i id="barFill"></i></div><span id="progText">Uploading…</span></div>
+  <div class="error" id="err" role="alert" hidden></div>
+
+  <div class="result" id="result" hidden>
+    <h3>✅ Done!</h3>
+    <p id="sum"></p>
+    <ul id="outs"></ul>
+    <p class="notes" id="notes"></p>
+    <a class="btn" id="dl" href="#">Download</a>
+    <button class="btn ghost" id="again" type="button">Start over</button>
+    <p class="muted">Your files are deleted automatically in about <span id="ttl">10</span> minutes.</p>
+  </div>
+</section>
+
+<section class="wrap prose">
+  <h2>How to {{ info.h1|lower }}</h2>
+  <ol>{% for s in info.steps %}<li>{{ s }}</li>{% endfor %}</ol>
+  <p>{{ info.about }}</p>
+  <h2>Frequently asked questions</h2>
+  {% for f in info.faq %}<details><summary>{{ f.q }}</summary><p>{{ f.a }}</p></details>{% endfor %}
+  <h2>More PDF tools</h2>
+  <div class="chips">{% for t in others %}<a href="/{{ seo_slug(t.key) }}">{{ t.name }}</a>{% endfor %}</div>
+</section>
+{% endblock %}

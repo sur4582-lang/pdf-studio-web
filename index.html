@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ cfg.SITE_NAME }} – Free Online PDF Tools: Compress, Merge, Split & Convert{% endblock %}
+{% block keywords %}<meta name="keywords" content="pdf tools, compress pdf, merge pdf, split pdf, jpg to pdf, pdf to jpg, free pdf tools, online pdf editor">{% endblock %}
+{% block head %}
+<script type="application/ld+json">{{ {"@context":"https://schema.org","@type":"WebSite","name":cfg.SITE_NAME,"url":canonical}|tojson }}</script>
+{% endblock %}
+{% block content %}
+<section class="hero"><div class="wrap">
+  <h1>Every PDF tool you need, in one place</h1>
+  <p>Compress, merge, split, convert and protect PDFs online. 100% free, fast and private. No signup. <span class="hi">PDF ke sare kaam ek jagah.</span></p>
+</div></section>
+<section class="wrap"><div class="grid">
+  {% for t in tools %}
+  <a class="card" href="/{{ seo[t.key].slug }}" style="--c:{{ t.color }}">
+    <span class="ico">{{ seo[t.key].icon }}</span>
+    <h2>{{ t.name }}</h2><p>{{ t.desc }}</p>
+  </a>
+  {% endfor %}
+</div></section>
+<section class="wrap prose">
+  <h2>Why use {{ cfg.SITE_NAME }}?</h2>
+  <p>{{ cfg.SITE_NAME }} brings the most useful PDF tools together: a smart compressor with target-size mode,
+  merge and split, page extraction, page numbers, watermarks, image conversion and AES-256 protection.
+  Uploaded files are deleted right after processing, and no account is needed.</p>
+</section>
+{% endblock %}
